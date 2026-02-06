@@ -52,24 +52,34 @@ def main_hydra(cfg: DictConfig):
     if output_dir and not os.path.exists(output_dir):
         os.makedirs(output_dir, exist_ok=True)
 
+    audios = []
+    original_outputs = []
+    original_outputs_with_hotword = []
+    finetuned_outputs_with_hotword = []
     with open(scp_file, "r", encoding="utf-8") as f1:
-        with open(output_file, "w", encoding="utf-8") as f2:
-            for line in f1:
-                line = line.strip()
-                if not line:
-                    continue
-                parts = line.split(maxsplit=1)
-                if len(parts) == 2:
-                    # text = model.generate(input=[parts[1]], cache={}, batch_size=1)[0]["text"]
-                    text = model.generate(input=[parts[1]], cache={}, batch_size=1, hotwords=["千问", "Xe", "Xe Core", "Lunar Lake", "Panther Lake", "Helicon Search", "Arrow Lake", "Helicon Search", "极空间", "铁威马"])[0]["text"]
-                    text1 = original_model.generate(input=[parts[1]], cache={}, batch_size=1)[0]["text"]
-                    text2 = original_model.generate(input=[parts[1]], cache={}, batch_size=1, hotwords=["千问", "Xe", "Xe Core", "Lunar Lake", "Panther Lake", "Helicon Search", "Arrow Lake", "Helicon Search", "极空间", "铁威马"])[0]["text"]
-                    # f2.write(f"{parts[0]}\t{text}\n")
-                    f2.write(f"{parts[0]}\n")
-                    f2.write(f"{text1}\n")
-                    f2.write(f"{text2}\n")
-                    f2.write(f"{text}\n")
-                    f2.write(f"\n")
+        for line in f1:
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.split(maxsplit=1)
+            if len(parts) == 2:
+                audios.append((parts[0], parts[1]))
+    for _, audio in audios:
+        text = original_model.generate(input=[audio], cache={}, batch_size=1)[0]["text"]
+        original_outputs.append(text)
+    for _, audio in audios:
+        text = original_model.generate(input=[audio], cache={}, batch_size=1, hotwords=["千问", "Xe", "Xe Core", "Lunar Lake", "Panther Lake", "Helicon Search", "Arrow Lake", "Helicon Search", "极空间", "铁威马"])[0]["text"]
+        original_outputs_with_hotword.append(text)
+    for _, audio in audios:
+        text = model.generate(input=[audio], cache={}, batch_size=1, hotwords=["千问", "Xe", "Xe Core", "Lunar Lake", "Panther Lake", "Helicon Search", "Arrow Lake", "Helicon Search", "极空间", "铁威马"])[0]["text"]
+        finetuned_outputs_with_hotword.append(text)
+    with open(output_file, "w", encoding="utf-8") as f2:
+        for i, audio in enumerate(audios):
+            f2.write(f"{audio[0]}\n")
+            f2.write(f"{original_outputs[i]}\n")
+            f2.write(f"{original_outputs_with_hotword[i]}\n")
+            f2.write(f"{finetuned_outputs_with_hotword[i]}\n")
+            f2.write(f"\n")
 
 
 if __name__ == "__main__":

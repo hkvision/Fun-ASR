@@ -33,8 +33,8 @@ def main_hydra(cfg: DictConfig):
     model = AutoModel(
         model=model_dir,
         trust_remote_code=True,
-        vad_model="fsmn-vad",
-        vad_kwargs={"max_single_segment_time": 30000},
+        # vad_model="fsmn-vad",
+        # vad_kwargs={"max_single_segment_time": 30000},
         remote_code="./model.py",
         device=device,
     )
@@ -52,6 +52,7 @@ def main_hydra(cfg: DictConfig):
                 parts = line.split(maxsplit=1)
                 if len(parts) == 2:
                     text = model.generate(input=[parts[1]], cache={}, batch_size=1)[0]["text"]
+                    # text = model.generate(input=[parts[1]], cache={}, batch_size=1, hotwords=["千问", "Xe", "Xe Core", "Lunar Lake", "Panther Lake", "Helicon Search", "Arrow Lake", "Helicon Search", "极空间", "铁威马"])[0]["text"]
                     f2.write(f"{parts[0]}\t{text}\n")
 
 

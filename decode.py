@@ -33,11 +33,15 @@ def main_hydra(cfg: DictConfig):
     model = AutoModel(
         model=model_dir,
         trust_remote_code=True,
-        # vad_model="fsmn-vad",
-        # vad_kwargs={"max_single_segment_time": 30000},
+        vad_model="fsmn-vad",
+        vad_kwargs={"max_single_segment_time": 30000},
         remote_code="./model.py",
         device=device,
     )
+    
+    with open("audios/hotwords.txt", "r", encoding="utf-8") as f:
+        hotwords = [line.strip() for line in f if line.strip()]
+    print("hotwords: ", hotwords)
 
     output_dir = os.path.dirname(output_file)
     if output_dir and not os.path.exists(output_dir):
@@ -49,10 +53,10 @@ def main_hydra(cfg: DictConfig):
                 line = line.strip()
                 if not line:
                     continue
-                parts = line.split(maxsplit=1)
+                parts = line.split("\t", maxsplit=1)
                 if len(parts) == 2:
-                    text = model.generate(input=[parts[1]], cache={}, batch_size=1)[0]["text"]
-                    # text = model.generate(input=[parts[1]], cache={}, batch_size=1, hotwords=["千问", "Xe", "Xe Core", "Lunar Lake", "Panther Lake", "Helicon Search", "Arrow Lake", "Helicon Search", "极空间", "铁威马"])[0]["text"]
+                    # text = model.generate(input=[parts[1]], cache={}, batch_size=1)[0]["text"]
+                    text = model.generate(input=[parts[1]], cache={}, batch_size=1, hotwords=hotwords)[0]["text"]
                     f2.write(f"{parts[0]}\t{text}\n")
 
 

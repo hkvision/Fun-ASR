@@ -150,16 +150,8 @@ def smart_split(data_list, ratios, priority_mode='fraction'):
 
 def main():
     # 目标热词列表
-    TARGET_HOTWORDS = [
-        "XE", 
-        "PantherLake", 
-        "ArrowLake", 
-        "Helicon Search", 
-        "千问", 
-        "Manus", 
-        "铁威马", 
-        "极空间"
-    ]
+    with open("hotwords.txt", "r", encoding="utf-8") as f:
+        TARGET_HOTWORDS = [line.strip() for line in f if line.strip()]
 
     # 定义源: (文件夹路径, 标识名, (Train/Val/Test比例), 划分模式)
     sources = [
@@ -168,6 +160,12 @@ def main():
         # (os.path.join("Intel_hotword_99", "Sunny"), "sunny", (0.6, 0.2, 0.2), "fraction"),
         (os.path.join("Intel_hotword_99", "tts"), "tts", (0.6, 0.2, 0.2), "fraction")
     ]
+    
+    # sources = [
+    #     (os.path.join("Intel_hotword_99", "Junlong"), "junlong", (0.0, 0.0, 1.0), "fraction"),
+    #     (os.path.join("Intel_hotword_99", "Sunny"), "sunny", (0.0, 0.0, 1.0), "fraction"),
+    #     (os.path.join("Intel_hotword_99", "Yanzhang"), "yanzhang", (0.0, 0.0, 1.0), "fraction")
+    # ]
 
     all_train = []
     all_val = []
@@ -210,22 +208,24 @@ def main():
         ("train", all_train),
         ("val", all_val),
         ("test", all_test)
+        # ("different_humans", all_test)
     ]
     
     for prefix, dataset in outputs:
-        wav_scp_name = f"{prefix}_wav.scp"
-        text_txt_name = f"{prefix}_text.txt"
-        
-        dataset.sort(key=lambda x: x['id'])
-        
-        with open(wav_scp_name, 'w', encoding='utf-8') as f_wav, \
-             open(text_txt_name, 'w', encoding='utf-8') as f_txt:
-            for item in dataset:
-                f_wav.write(f"{item['id']}\t{item['wav_path']}\n")
-                f_txt.write(f"{item['id']}\t{item['text']}\n")
-                
-        print(f"已生成: {wav_scp_name:<15} (共 {len(dataset)} 条)")
-        print(f"已生成: {text_txt_name:<15}")
+        if len(dataset) > 0:
+            wav_scp_name = f"{prefix}_wav.scp"
+            text_txt_name = f"{prefix}_text.txt"
+            
+            dataset.sort(key=lambda x: x['id'])
+            
+            with open(wav_scp_name, 'w', encoding='utf-8') as f_wav, \
+                open(text_txt_name, 'w', encoding='utf-8') as f_txt:
+                for item in dataset:
+                    f_wav.write(f"{item['id']}\t{item['wav_path']}\n")
+                    f_txt.write(f"{item['id']}\t{item['text']}\n")
+                    
+            print(f"已生成: {wav_scp_name:<15} (共 {len(dataset)} 条)")
+            print(f"已生成: {text_txt_name:<15}")
 
     print("\n所有操作完成！")
 

@@ -12,6 +12,14 @@ from modelscope import AutoTokenizer
 from tqdm import tqdm
 from omegaconf import DictConfig, OmegaConf, ListConfig
 
+with open("audios/hotwords.txt", "r", encoding="utf-8") as f:
+    hotwords = [line.strip() for line in f if line.strip()]
+hotwords = ", ".join(hotwords)
+prompt = f"请结合上下文信息，更加准确地完成语音转写任务。如果没有相关信息，我们会留空。\n\n\n**上下文信息：**\n\n\n"
+prompt += f"热词列表：[{hotwords}]\n"
+prompt += "语音转写"
+prompt += "："
+
 
 class LineProcessor:
     def __init__(self, tokenizer):
@@ -25,7 +33,7 @@ class LineProcessor:
         if not line1 or not line2:
             return None
 
-        parts1, parts2 = line1.split(maxsplit=1), line2.split(maxsplit=1)
+        parts1, parts2 = line1.split("\t", maxsplit=1), line2.split("\t", maxsplit=1)
         if len(parts1) != 2 or len(parts2) != 2:
             return None
 
@@ -47,11 +55,6 @@ class LineProcessor:
                     return {"error": f"WAV not found: {wav_path}"}
                 duration = sf.info(wav_path).duration
 
-            hotwords = ", ".join(["千问", "Xe", "Xe Core", "Lunar Lake", "Panther Lake", "Helicon Search", "Arrow Lake", "Helicon Search", "极空间", "铁威马"])
-            prompt = f"请结合上下文信息，更加准确地完成语音转写任务。如果没有相关信息，我们会留空。\n\n\n**上下文信息：**\n\n\n"
-            prompt += f"热词列表：[{hotwords}]\n"
-            prompt += "语音转写"
-            prompt += "："
             data = {
                 "messages": [
                     {"role": "system", "content": "You are a helpful assistant."},

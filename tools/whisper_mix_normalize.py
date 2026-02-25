@@ -61,7 +61,7 @@ def normalize_text(srcfn, dstfn, kana=False):
         all_lines = f_read.readlines()
         for line in all_lines:
             line = line.strip()
-            line_arr = line.split(maxsplit=1)
+            line_arr = line.split("\t", maxsplit=1)
             if len(line_arr) < 1:
                 continue
             if len(line_arr) == 1:
@@ -74,11 +74,11 @@ def normalize_text(srcfn, dstfn, kana=False):
             if kana:
                 line_arr[1] = safe_ja_g2p(line_arr[1], kana=True, max_length=100)
 
-            line_arr = f"{key}\t{line_arr[1]}".split()
+            line_arr = f"{line_arr[1]}".split()
             conts = []
             language_bak = ""
             part = []
-            for i in range(1, len(line_arr)):
+            for i in range(0, len(line_arr)):
                 out_part = ""
                 chn_eng_bool = is_only_chinese_and_english(line_arr[i])
                 eng_bool = is_only_english(line_arr[i])

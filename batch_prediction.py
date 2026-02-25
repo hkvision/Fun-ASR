@@ -18,13 +18,16 @@ audios = os.listdir(audio_dir)
 audios = [audio for audio in audios if not audio.endswith("txt")]
 output_dir = "Fun-ASR/audios/02_03_17_54_finetuned/"
 
+with open("audios/hotwords.txt", "r", encoding="utf-8") as f:
+    hotwords = [line.strip() for line in f if line.strip()]
+
 for audio in audios:
     wav_path = audio_dir + audio
     res = model.generate(
         input=[wav_path],
         cache={},
         batch_size=1,
-        hotwords=["千问", "Xe", "Xe Core", "Lunar Lake", "Panther Lake", "Helicon Search", "Arrow Lake", "Helicon Search", "极空间", "铁威马"],
+        hotwords=hotwords,
         # 中文、英文、日文 for Fun-ASR-Nano-2512
         # 中文、英文、粤语、日文、韩文、越南语、印尼语、泰语、马来语、菲律宾语、阿拉伯语、
         # 印地语、保加利亚语、克罗地亚语、捷克语、丹麦语、荷兰语、爱沙尼亚语、芬兰语、希腊语、

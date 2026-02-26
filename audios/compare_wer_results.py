@@ -59,7 +59,13 @@ def extract_wer_value(wer_line):
 def main():
     initial_path = "results/initial_test_wer.txt"
     finetuned_path = "results/finetuned_test_wer.txt"
-    output_path = "results/merged_comparison.txt"
+    output_path = "results/merged_comparison_test_wer.txt"
+    # initial_path = "results/initial_train_val_wer.txt"
+    # finetuned_path = "results/finetuned_train_val_wer.txt"
+    # output_path = "results/merged_comparison_train_val_wer.txt"
+    # initial_path = "results/initial_different_humans_wer.txt"
+    # finetuned_path = "results/finetuned_different_humans_wer.txt"
+    # output_path = "results/merged_comparison_different_humans_wer.txt"
 
     if len(sys.argv) == 3:
         initial_path, finetuned_path = sys.argv[1], sys.argv[2]
@@ -101,6 +107,9 @@ def main():
         only_initial = 0
         only_finetuned = 0
         both = 0
+        improved = 0
+        unchanged = 0
+        degraded = 0
 
         for utt in all_utts:
             has_initial = utt in initial_entries
@@ -116,6 +125,12 @@ def main():
                 try:
                     delta = float(wer_fin) - float(wer_ini)
                     delta_str = f"{delta:+.2f}%"
+                    if delta < 0:
+                        improved += 1
+                    elif delta == 0:
+                        unchanged += 1
+                    else:
+                        degraded += 1
                 except ValueError:
                     delta_str = "N/A"
 
@@ -148,10 +163,12 @@ def main():
 
         out.write("=" * 79 + "\n")
         out.write(f"Coverage: both={both}  initial_only={only_initial}  finetuned_only={only_finetuned}\n")
+        out.write(f"WER change (utterances in both): improved={improved}  unchanged={unchanged}  degraded={degraded}\n")
         out.write("=" * 79 + "\n")
 
     print(f"Merged {len(all_utts)} utterances -> {output_path}")
     print(f"  both={both}, initial_only={only_initial}, finetuned_only={only_finetuned}")
+    print(f"  WER change (utterances in both): improved={improved}, unchanged={unchanged}, degraded={degraded}")
 
 
 if __name__ == "__main__":

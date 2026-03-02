@@ -12,16 +12,22 @@ model = AutoModel(
     vad_model="fsmn-vad",
     vad_kwargs={"max_single_segment_time": 30000},
 )
+# Disable dither for deterministic inference (dither is for training only)
+model.kwargs["frontend"].dither = 0.0
+if hasattr(model, "_base_kwargs_map") and "kwargs" in model._base_kwargs_map:
+    model._base_kwargs_map["kwargs"]["frontend"].dither = 0.0
 
-with open("audios/hotwords.txt", "r", encoding="utf-8") as f:
-    hotwords = [line.strip() for line in f if line.strip()]
+# with open("audios/hotwords.txt", "r", encoding="utf-8") as f:
+#     hotwords = [line.strip() for line in f if line.strip()]
 
 audio_dir = "audios/real_meeting/铁威马/"
 audios = os.listdir(audio_dir)
 audios = [audio for audio in audios if not audio.endswith("txt")]
 audios = ["/home/arda/kai/LenovoSmartMeeting/Fun-ASR/" + audio_dir + audio for audio in audios]
-# audios = [audios[-1]]
+# audios = [audios[1], audios[2], audios[0]]
+# audios = [audios[0]]
 hotwords = ["铁威马"]
+# hotwords = []
 
 # wav_path = "/home/arda/kai/LenovoSmartMeeting/Fun-ASR/audios/Intel_hotword_99/tts/XE/10_v1_uncle_fu_mature.wav"
 # audios = [wav_path]
@@ -39,7 +45,7 @@ for audio in audios:
     results.append((audio, text))
 
 for result in results:
-    print("=============", result[0])
+    print("===", result[0])
     print(result[1])
 
 # model = AutoModel(

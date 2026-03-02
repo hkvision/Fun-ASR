@@ -38,6 +38,10 @@ def main_hydra(cfg: DictConfig):
         remote_code="./model.py",
         device=device,
     )
+    # Disable dither for deterministic inference (dither is for training only)
+    model.kwargs["frontend"].dither = 0.0
+    if hasattr(model, "_base_kwargs_map") and "kwargs" in model._base_kwargs_map:
+        model._base_kwargs_map["kwargs"]["frontend"].dither = 0.0
     
     with open("audios/hotwords.txt", "r", encoding="utf-8") as f:
         hotwords = [line.strip() for line in f if line.strip()]

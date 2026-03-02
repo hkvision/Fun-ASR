@@ -1,7 +1,7 @@
-export PYTHONPATH=/home/arda/kai/Fun-ASR-Nano-2512/compute-weighted-wer/:$PYTHONPATH
+export PYTHONPATH=/home/arda/kai/LenovoSmartMeeting/compute-weighted-wer:$PYTHONPATH
 
-# MODEL=/home/arda/kai/Fun-ASR-Nano-2512/
-MODEL=/home/arda/kai/Fun-ASR-Nano-2512/Fun-ASR/outputs
+# MODEL=/home/arda/kai/LenovoSmartMeeting/Fun-ASR-Nano-2512
+MODEL=/home/arda/kai/LenovoSmartMeeting/Fun-ASR/outputs
 
 DATA=audios/dataset/test_wav.scp
 GROUNDTRUTH=audios/dataset/test_text_norm.txt
@@ -24,9 +24,9 @@ python decode.py \
 
 python tools/whisper_mix_normalize.py predictions.txt predictions_norm.txt
 
-python /home/arda/kai/Fun-ASR-Nano-2512/compute-weighted-wer/compute_wer/cli.py ${GROUNDTRUTH} predictions_norm.txt audios/results/wer.txt --hotword-file audios/hotwords.txt
+python /home/arda/kai/LenovoSmartMeeting/compute-weighted-wer/compute_wer/cli.py ${GROUNDTRUTH} predictions_norm.txt audios/results/wer.txt --hotword-file audios/hotwords.txt
 # without hotword
-# python /home/arda/kai/Fun-ASR-Nano-2512/compute-weighted-wer/compute_wer/cli.py ${GROUNDTRUTH} predictions_norm.txt audios/results/wer.txt
+# python /home/arda/kai/LenovoSmartMeeting/compute-weighted-wer/compute_wer/cli.py ${GROUNDTRUTH} predictions_norm.txt audios/results/wer.txt
 
 python audios/sort_wer.py
 

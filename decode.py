@@ -1,4 +1,5 @@
 import os
+import json
 
 import hydra
 import torch
@@ -43,9 +44,11 @@ def main_hydra(cfg: DictConfig):
     if hasattr(model, "_base_kwargs_map") and "kwargs" in model._base_kwargs_map:
         model._base_kwargs_map["kwargs"]["frontend"].dither = 0.0
     
-    with open("audios/hotwords.txt", "r", encoding="utf-8") as f:
-        hotwords = [line.strip() for line in f if line.strip()]
-    print("hotwords: ", hotwords)
+    # with open("audios/hotwords.txt", "r", encoding="utf-8") as f:
+    #     hotwords = [line.strip() for line in f if line.strip()]
+    # print("hotwords: ", hotwords)
+    with open("audios/dataset/keyword_hits.json", encoding="utf-8") as f:
+        keyword_hits = json.load(f)
 
     output_dir = os.path.dirname(output_file)
     if output_dir and not os.path.exists(output_dir):
@@ -59,6 +62,8 @@ def main_hydra(cfg: DictConfig):
                     continue
                 parts = line.split("\t", maxsplit=1)
                 if len(parts) == 2:
+                    hotwords = keyword_hits[parts[0]]
+                    print("{} hotwords: {}".format(parts[0], hotwords))
                     # text = model.generate(input=[parts[1]], cache={}, batch_size=1)[0]["text"]
                     text = model.generate(input=[parts[1]], cache={}, batch_size=1, hotwords=hotwords)[0]["text"]
                     f2.write(f"{parts[0]}\t{text}\n")
